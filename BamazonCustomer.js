@@ -1,7 +1,7 @@
 //require inquirer npm package
 var inquirer = require('inquirer');
 var mysql = require("mysql");
-var passWord = "Jb3339550";
+var passWord = "";
 
 var connection = mysql.createConnection({
     host: "localhost",
