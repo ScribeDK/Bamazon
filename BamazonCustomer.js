@@ -59,7 +59,7 @@ var buyItem = function(itemID) {
 		if(err) throw err;
 		
 		isEnough = res[0].stockQuantity - answer.itemQuantity;
-		console.log(isEnough);
+
 		if (isEnough >= 0){
 			connection.query("UPDATE products SET ? WHERE ?", [{ stockQuantity: isEnough},
 			{itemID: itemID}], function(err, res){});
