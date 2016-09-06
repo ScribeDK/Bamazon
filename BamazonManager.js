@@ -92,14 +92,14 @@ var addItem = function() {
         type: "input",
         message: "How much stock has been added?",
     }]).then(function(answer) {
-		
+		console.log(answer.itemID);
 		connection.query("SELECT * FROM products WHERE ?",{ itemID: answer.itemID}, function(err, res){
 		if(err) throw err;
 		
-		isAdded = res[0].stockQuantity + answer.itemQuantity;
-
+		isAdded = parseInt(res[0].stockQuantity) + parseInt(answer.itemQuantity);
+		
 		connection.query("UPDATE products SET ? WHERE ?", [{ stockQuantity: isAdded},
-		{itemID: itemID}], function(err, res){});
+		{itemID: answer.itemID}], function(err, res){});
 		console.log("Transaction processed.\nWould you like somthing else?");
 		mainMenu();
 	

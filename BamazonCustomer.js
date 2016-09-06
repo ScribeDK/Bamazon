@@ -58,7 +58,7 @@ var buyItem = function(itemID) {
 		connection.query("SELECT * FROM products WHERE ?",{ itemID: itemID}, function(err, res){
 		if(err) throw err;
 		
-		isEnough = res[0].stockQuantity - answer.itemQuantity;
+		isEnough = parseInt(res[0].stockQuantity) - parseInt(answer.itemQuantity);
 
 		if (isEnough >= 0){
 			connection.query("UPDATE products SET ? WHERE ?", [{ stockQuantity: isEnough},
