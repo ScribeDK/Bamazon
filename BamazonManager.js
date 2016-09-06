@@ -16,6 +16,7 @@ connection.connect(function(err) {
     mainMenu();
 })
 
+//let user select operation from list
 var mainMenu = function(){
 	inquirer.prompt({
         name: "action",
@@ -37,7 +38,7 @@ var mainMenu = function(){
             break;
             
             case 'Add New Product':
-                addProduct();
+                newProductID();
             break;
 			case 'Exit Program':
                 exitProgram();
@@ -47,12 +48,14 @@ var mainMenu = function(){
     })
 };
 
+//end program
 var exitProgram = function(){
 	connection.end(function(err){
 	console.log("\nHave a nice day.")
 	})
 }
 
+//list all product data
 var runSearch = function() {
 	
 	connection.query("SELECT * FROM products", function(err, res){
@@ -63,10 +66,12 @@ var runSearch = function() {
 	for (i in res){
 		console.log(res[i].itemID + ": " + res[i].productName + " : " + res[i].departmentName + " : $" + res[i].price + " : " + res[i].stockQuantity );
 	}
-	});
 	mainMenu();
+	});
+	
 };
 
+//list all products with 5 or less units in stock
 var	lowItem = function(){
 	
 	connection.query("SELECT * FROM products", function(err, res){
@@ -78,10 +83,12 @@ var	lowItem = function(){
 		if (res[i].stockQuantity <= 5){
 		console.log(res[i].itemID + ": " + res[i].productName + " : " + res[i].departmentName + " : $" + res[i].price + " : " + res[i].stockQuantity );
 	}}
-	});
 	mainMenu();
+	});
+	
 };
 
+// add new inventory to exiting products by item ID
 var addItem = function() {
 	    inquirer.prompt([{
         name: "itemID",
@@ -99,39 +106,60 @@ var addItem = function() {
 		isAdded = parseInt(res[0].stockQuantity) + parseInt(answer.itemQuantity);
 		
 		connection.query("UPDATE products SET ? WHERE ?", [{ stockQuantity: isAdded},
-		{itemID: answer.itemID}], function(err, res){});
-		console.log("Transaction processed.\nWould you like somthing else?");
-		mainMenu();
+		{itemID: answer.itemID}], function(err, res){
+			console.log("Items added.\nWould you like somthing else?");
+			mainMenu();
+		});
+		
 	
 		});
 		
 	});
 };
 
-var addProduct = function() {
-	    inquirer.prompt({
+//get next itemID and pass to addProduct
+var newProductID = function(){
+	
+		connection.query("SELECT * FROM products", function(err, res){
+		if(err) {throw err;};
+		var newItemID = 1;
+		newItemID += res.length;
+		addProduct(newItemID);
+		});
+};
+
+//ask for new product data from user and add it to the database
+var addProduct = function(newItemID) {
+	    inquirer.prompt([{
+        name: "name",
+        type: "input",
+        message: "Enter item name.",
+    },{
+        name: "department",
+        type: "input",
+        message: "Enter item department",
+    },{
+        name: "price",
+        type: "input",
+        message: "Enter item price.",
+    },{
         name: "itemQuantity",
         type: "input",
-        message: "How Many do you want?",
-    }).then(function(answer) {
+        message: "How much stock has been added?",
+    }]).then(function(answer) {
 		
-		connection.query("SELECT * FROM products WHERE ?",{ itemID: itemID}, function(err, res){
-		if(err) throw err;
+		var itemPrice = parseFloat(answer.price);
+		var itemNum = parseInt(answer.itemQuantity);
 		
-		isEnough = res[0].stockQuantity - answer.itemQuantity;
-		console.log(isEnough);
-		if (isEnough >= 0){
-			connection.query("UPDATE products SET ? WHERE ?", [{ stockQuantity: isEnough},
-			{itemID: itemID}], function(err, res){});
-			console.log("Transaction processed.\nWould you like somthing else?");
-			runSearch();
-			
-		}
-		else {console.log("Sorry we don't have enough to sell you that many. \nWould you like something else?");
+		connection.query("INSERT INTO products SET ?", {
+		itemID: newItemID,
+		productName: answer.name,
+		departmentName: answer.department,
+		price: itemPrice,
+		stockQuantity: itemNum
+	}, function(err, res){
+		console.log("New product added.\nWould you like somthing else?");
 		mainMenu();
-		}	
-	
-		});
-		
+		});		
 	});
 };

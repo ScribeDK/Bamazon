@@ -16,6 +16,7 @@ connection.connect(function(err) {
     runSearch();
 })
 
+//show all product data
 var runSearch = function() {
 	
 	connection.query("SELECT * FROM products", function(err, res){
@@ -29,6 +30,8 @@ var runSearch = function() {
 	selectItem();
 	});
 }
+
+//let user select product to buy by item ID
 var	selectItem = function(){
     inquirer.prompt({
         name: "action",
@@ -48,6 +51,7 @@ var	selectItem = function(){
 	})
 };
 
+//ask use how many units of product they want, block requests over avalable amounts
 var buyItem = function(itemID) {
 	    inquirer.prompt({
         name: "itemQuantity",
