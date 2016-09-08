@@ -1,13 +1,13 @@
 //require inquirer npm package
 var inquirer = require('inquirer');
 var mysql = require("mysql");
-var passWord = "";
+var passWord = ""; //Your password
 
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root", //Your username
-    password: passWord, //Your password
+    password: passWord, 
     database: "bamazondb"
 })
 
